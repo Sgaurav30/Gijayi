@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { MongoClient, Db, ServerDescription } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI as string;
 const MONGODB_DB = process.env.MONGODB_DB || 'gijayi';
 
 if (!MONGODB_URI) {
@@ -18,8 +18,24 @@ let cachedClient: MongoClient | undefined;
 let cachedDb: Db | undefined;
 
 async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
-  if (cachedClient && cachedDb && cachedClient.topology?.isConnected()) {
-    return { client: cachedClient, db: cachedDb };
+  // Return cached connection if it's already established
+  if (cachedClient && cachedDb) {
+    try {
+      // Verify the connection is still alive with a quick ping
+      await cachedClient.db('admin').command({ ping: 1 }).catch(() => {
+        // Connection is dead, will reconnect below
+        cachedClient = undefined;
+        cachedDb = undefined;
+      });
+      
+      if (cachedClient && cachedDb) {
+        return { client: cachedClient, db: cachedDb };
+      }
+    } catch {
+      // Connection failed, will reconnect
+      cachedClient = undefined;
+      cachedDb = undefined;
+    }
   }
 
   try {
