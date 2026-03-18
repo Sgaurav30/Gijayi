@@ -2,11 +2,66 @@ import 'server-only';
 
 import { MongoClient, Db } from 'mongodb';
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-const MONGODB_DB = process.env.MONGODB_DB || 'gijayi';
+const RAW_MONGODB_URI = process.env.MONGODB_URI;
+const RAW_MONGODB_DB = process.env.MONGODB_DB;
+
+function normalizeMongoUri(uri: string | undefined): string {
+  if (!uri) {
+    return '';
+  }
+
+  const trimmedUri = uri.trim();
+
+  if (
+    (trimmedUri.startsWith('"') && trimmedUri.endsWith('"')) ||
+    (trimmedUri.startsWith("'") && trimmedUri.endsWith("'"))
+  ) {
+    return trimmedUri.slice(1, -1).trim();
+  }
+
+  return trimmedUri;
+}
+
+function extractDatabaseNameFromUri(uri: string): string | undefined {
+  try {
+    const parsedUri = new URL(uri);
+    const dbName = parsedUri.pathname.replace(/^\//, '').trim();
+    return dbName || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeMongoDbName(dbName: string | undefined): string {
+  if (!dbName) {
+    return '';
+  }
+
+  const trimmedDbName = dbName.trim();
+
+  if (
+    (trimmedDbName.startsWith('"') && trimmedDbName.endsWith('"')) ||
+    (trimmedDbName.startsWith("'") && trimmedDbName.endsWith("'"))
+  ) {
+    return trimmedDbName.slice(1, -1).trim();
+  }
+
+  return trimmedDbName;
+}
+
+const MONGODB_URI = normalizeMongoUri(RAW_MONGODB_URI);
+const MONGODB_DB =
+  normalizeMongoDbName(RAW_MONGODB_DB) || extractDatabaseNameFromUri(MONGODB_URI) || 'Gijayi';
 
 if (!MONGODB_URI) {
   throw new Error('Missing MONGODB_URI environment variable.');
+}
+
+if (!MONGODB_URI.startsWith('mongodb://') && !MONGODB_URI.startsWith('mongodb+srv://')) {
+  throw new Error(
+    'Invalid MONGODB_URI format. It must start with "mongodb://" or "mongodb+srv://". ' +
+      'If you set this in Vercel, remove any extra quotes around the value.'
+  );
 }
 
 declare global {
