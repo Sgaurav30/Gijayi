@@ -13,6 +13,10 @@ export interface Product {
   isBestseller?: boolean;
   slug: string;
   stock: number;
+  mostWanted?: boolean;
+  bridalLuxe?: boolean;
+  heritage?: boolean;
+  everydayMinimal?: boolean;
 }
 
 export interface CartItem {

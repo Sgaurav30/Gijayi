@@ -53,6 +53,15 @@ export async function PUT(request: NextRequest) {
           href?: string;
         };
       };
+      carousel?: {
+        id?: string;
+        banners?: Array<{
+          id?: string;
+          image?: string;
+          headline?: string;
+          subtitle?: string;
+        }>;
+      };
       luxurySignals?: string[];
       trustSection?: {
         badge?: string;
@@ -128,6 +137,18 @@ export async function PUT(request: NextRequest) {
             title: String(body.hero?.secondaryMedia?.title ?? current.hero.secondaryMedia.title).trim(),
             href: String(body.hero?.secondaryMedia?.href ?? current.hero.secondaryMedia.href).trim() || '/about',
           },
+        },
+        carousel: {
+          id: String(body.carousel?.id ?? current.carousel?.id ?? 'carousel-config'),
+          banners: (Array.isArray(body.carousel?.banners) ? body.carousel?.banners : current.carousel?.banners || [])
+            .map((item, idx) => ({
+              id: String(item?.id || `banner-${idx + 1}`),
+              image: String(item?.image || '').trim(),
+              headline: String(item?.headline || '').trim(),
+              subtitle: String(item?.subtitle || '').trim(),
+            }))
+            .filter((item) => item.image && item.headline && item.subtitle)
+            .slice(0, 4),
         },
         luxurySignals: (Array.isArray(body.luxurySignals) ? body.luxurySignals : current.luxurySignals)
           .map((item) => String(item || '').trim())

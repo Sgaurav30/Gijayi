@@ -24,6 +24,10 @@ interface AdminProduct {
   collection: string;
   images?: string[];
   isNew?: boolean;
+  mostWanted?: boolean;
+  bridalLuxe?: boolean;
+  heritage?: boolean;
+  everydayMinimal?: boolean;
 }
 
 const defaultForm = {
@@ -36,6 +40,10 @@ const defaultForm = {
   image: '',
   details: '',
   isNew: false,
+  mostWanted: false,
+  bridalLuxe: false,
+  heritage: false,
+  everydayMinimal: false,
 };
 
 export default function AdminProductsPage() {
@@ -94,6 +102,10 @@ export default function AdminProductsPage() {
       image: selectedProduct.images?.[0] || '',
       details: '',
       isNew: Boolean(selectedProduct.isNew),
+      mostWanted: Boolean(selectedProduct.mostWanted),
+      bridalLuxe: Boolean(selectedProduct.bridalLuxe),
+      heritage: Boolean(selectedProduct.heritage),
+      everydayMinimal: Boolean(selectedProduct.everydayMinimal),
     });
     setImageFile(null);
   }, [selectedProduct]);
@@ -142,6 +154,10 @@ export default function AdminProductsPage() {
       images: imageUrl ? [imageUrl] : undefined,
       details: form.details ? form.details.split(',').map((item) => item.trim()).filter(Boolean) : undefined,
       isNew: Boolean(form.isNew),
+      mostWanted: Boolean(form.mostWanted),
+      bridalLuxe: Boolean(form.bridalLuxe),
+      heritage: Boolean(form.heritage),
+      everydayMinimal: Boolean(form.everydayMinimal),
     };
 
     const hasCollection = navigation?.gijayiEdit.subcategories.some(
@@ -231,6 +247,48 @@ export default function AdminProductsPage() {
             Add this product to Fresh Arrivals
           </label>
 
+          <div className="border-t border-slate-200 pt-4">
+            <p className="text-xs tracking-widest uppercase text-slate-600 mb-3 font-medium">Featured Sections</p>
+            <div className="space-y-2">
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.mostWanted}
+                  onChange={(event) => setForm({ ...form, mostWanted: event.target.checked })}
+                  className="accent-emerald-600"
+                />
+                Most Wanted (Customer Favorites)
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.bridalLuxe}
+                  onChange={(event) => setForm({ ...form, bridalLuxe: event.target.checked })}
+                  className="accent-emerald-600"
+                />
+                Bridal Luxe Collection
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.heritage}
+                  onChange={(event) => setForm({ ...form, heritage: event.target.checked })}
+                  className="accent-emerald-600"
+                />
+                Heritage Collection
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.everydayMinimal}
+                  onChange={(event) => setForm({ ...form, everydayMinimal: event.target.checked })}
+                  className="accent-emerald-600"
+                />
+                Everyday Minimal Collection
+              </label>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <input
               type="file"
@@ -259,25 +317,54 @@ export default function AdminProductsPage() {
 
       <section className="bg-white border border-slate-200 rounded-2xl p-6">
         <h3 className="font-serif text-2xl text-slate-900 mb-4">Catalog List</h3>
-        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-          <p className="text-xs tracking-widest uppercase text-blue-700 mb-1">Fresh Arrivals</p>
-          <p className="text-sm text-blue-800">
-            {(products.filter((item) => item.isNew).length)} products currently marked as Fresh Arrivals.
-          </p>
+        <div className="space-y-2 mb-6">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+            <p className="text-xs tracking-widest uppercase text-blue-700 mb-1">Fresh Arrivals</p>
+            <p className="text-sm text-blue-800">
+              {(products.filter((item) => item.isNew).length)} products currently marked as Fresh Arrivals.
+            </p>
+          </div>
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+            <p className="text-xs tracking-widest uppercase text-emerald-700 mb-1">Featured Collections</p>
+            <div className="text-sm text-emerald-800 space-y-1">
+              <p>Most Wanted: {(products.filter((item) => item.mostWanted).length)} products</p>
+              <p>Bridal Luxe: {(products.filter((item) => item.bridalLuxe).length)} products</p>
+              <p>Heritage: {(products.filter((item) => item.heritage).length)} products</p>
+              <p>Everyday Minimal: {(products.filter((item) => item.everydayMinimal).length)} products</p>
+            </div>
+          </div>
         </div>
-        <div className="space-y-2 max-h-[700px] overflow-y-auto pr-1">
-          {products.map((product) => (
+        <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+          {products.map((product) => {
+            const sections = [];
+            if (product.isNew) sections.push('Fresh');
+            if (product.mostWanted) sections.push('Most Wanted');
+            if (product.bridalLuxe) sections.push('Bridal');
+            if (product.heritage) sections.push('Heritage');
+            if (product.everydayMinimal) sections.push('Minimal');
+            
+            return (
             <div key={product.id} className="border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-slate-900 truncate">{product.name}</p>
-                <p className="text-xs text-slate-500 truncate">{product.category} · {product.collection}{product.isNew ? ' · Fresh Arrival' : ''}</p>
+                <p className="text-xs text-slate-500 truncate">{product.category} · {product.collection}</p>
+                {sections.length > 0 && (
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {sections.map((section) => (
+                      <span key={section} className="inline-block bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded">
+                        {section}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-slate-900">₹{product.price.toLocaleString('en-IN')}</p>
                 <p className="text-xs text-slate-500">Stock: {product.stock}</p>
               </div>
             </div>
-          ))}
+            );
+          })}
           {!products.length && <p className="text-sm text-slate-500">No products yet.</p>}
         </div>
       </section>

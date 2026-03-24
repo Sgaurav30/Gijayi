@@ -87,6 +87,10 @@ export async function POST(request: NextRequest) {
         isNew: Boolean(body.isNew),
         isBestseller: Boolean(body.isBestseller),
         stock,
+        mostWanted: Boolean(body.mostWanted),
+        bridalLuxe: Boolean(body.bridalLuxe),
+        heritage: Boolean(body.heritage),
+        everydayMinimal: Boolean(body.everydayMinimal),
       };
 
       state.products.unshift(product);

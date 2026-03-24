@@ -8,6 +8,18 @@ import { ArrowRight, Star, Shield, Truck, RotateCcw, Sparkles, Gem, BadgeCheck, 
 import ProductCard from '@/components/ProductCard';
 import { Collection, Product } from '@/lib/types';
 
+interface CarouselBanner {
+  id: string;
+  image: string;
+  headline: string;
+  subtitle: string;
+}
+
+interface StorefrontCarousel {
+  id: string;
+  banners: CarouselBanner[];
+}
+
 interface StorefrontSettings {
   hero: {
     badge: string;
@@ -29,6 +41,7 @@ interface StorefrontSettings {
       href: string;
     };
   };
+  carousel?: StorefrontCarousel;
   luxurySignals: string[];
   trustSection: {
     badge: string;
@@ -114,23 +127,27 @@ const defaultTestimonialsSection = {
 };
 
 function HeroSection({ storefront }: { storefront: StorefrontSettings }) {
-  const heroSlides = [
+  const heroSlides = storefront.carousel?.banners || [
     {
+      id: 'banner-1',
       image: storefront.hero.heroImage,
       headline: 'Handcrafted Bridal Luxury',
       subtitle: 'Statement jewelry designed for grand wedding celebrations.',
     },
     {
+      id: 'banner-2',
       image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=90',
       headline: 'Timeless Kundan & Polki',
       subtitle: 'Classic Indian artistry with modern, wearable elegance.',
     },
     {
+      id: 'banner-3',
       image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1400&q=90',
       headline: 'Made in India Craftsmanship',
       subtitle: 'Every detail is handcrafted with premium materials.',
     },
     {
+      id: 'banner-4',
       image: 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=1400&q=90',
       headline: 'Affordable Designer Jewelry',
       subtitle: 'Luxury-inspired looks at fair prices.',
@@ -155,7 +172,7 @@ function HeroSection({ storefront }: { storefront: StorefrontSettings }) {
     <section className="relative h-[88vh] min-h-[560px] w-full overflow-hidden">
       {heroSlides.map((slide, index) => (
         <Image
-          key={slide.headline}
+          key={slide.id}
           src={slide.image}
           alt={slide.headline}
           fill
@@ -312,7 +329,8 @@ function CollectionsSection({ collections }: { collections: Collection[] }) {
 
 function BestsellersSection({ products, storefront }: { products: Product[]; storefront: StorefrontSettings }) {
   const productCardContent = storefront.productCard || defaultProductCardContent;
-  const bestsellers = products.filter((product) => product.isBestseller).slice(0, 4);
+  const mostWantedProducts = products.filter((product) => product.mostWanted).slice(0, 4);
+  const bestsellers = mostWantedProducts.length > 0 ? mostWantedProducts : products.filter((product) => product.isBestseller).slice(0, 4);
 
   return (
     <section className="py-20 md:py-28 bg-white">
@@ -329,6 +347,87 @@ function BestsellersSection({ products, storefront }: { products: Product[]; sto
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {bestsellers.map((product) => <ProductCard key={product.id} product={product} content={productCardContent} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BridalLuxeSection({ products, storefront }: { products: Product[]; storefront: StorefrontSettings }) {
+  const productCardContent = storefront.productCard || defaultProductCardContent;
+  const bridalProducts = products.filter((product) => product.bridalLuxe).slice(0, 4);
+
+  if (bridalProducts.length === 0) return null;
+
+  return (
+    <section className="py-20 md:py-28 bg-gradient-to-br from-rose-50 to-white border-y border-rose-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-end justify-between mb-14 gap-8">
+          <div className="flex-1">
+            <p className="text-[10px] tracking-[0.5em] uppercase text-rose-600 mb-4 font-medium">Wedding Collection</p>
+            <h2 className="font-serif text-5xl md:text-6xl text-slate-900">Bridal Luxe</h2>
+            <p className="text-slate-600 mt-4 max-w-md">Opulent jewellery crafted for your most cherished moments. Every piece tells a story.</p>
+          </div>
+          <Link href="/collections/bridal-collection" className="hidden md:flex items-center gap-2 text-sm tracking-widest uppercase text-slate-900 hover:text-slate-600 transition-colors font-medium whitespace-nowrap">
+            View All <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {bridalProducts.map((product) => <ProductCard key={product.id} product={product} content={productCardContent} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeritageSection({ products, storefront }: { products: Product[]; storefront: StorefrontSettings }) {
+  const productCardContent = storefront.productCard || defaultProductCardContent;
+  const heritageProducts = products.filter((product) => product.heritage).slice(0, 4);
+
+  if (heritageProducts.length === 0) return null;
+
+  return (
+    <section className="py-20 md:py-28 bg-gradient-to-br from-slate-50 to-white border-y border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-end justify-between mb-14 gap-8">
+          <div className="flex-1">
+            <p className="text-[10px] tracking-[0.5em] uppercase text-slate-500 mb-4 font-medium">Timeless Artistry</p>
+            <h2 className="font-serif text-5xl md:text-6xl text-slate-900">Heritage</h2>
+            <p className="text-slate-600 mt-4 max-w-md">Classic Indian artistry with modern, wearable elegance. Pieces that transcend generations.</p>
+          </div>
+          <Link href="/collections/heritage-collection" className="hidden md:flex items-center gap-2 text-sm tracking-widest uppercase text-slate-900 hover:text-slate-600 transition-colors font-medium whitespace-nowrap">
+            View All <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {heritageProducts.map((product) => <ProductCard key={product.id} product={product} content={productCardContent} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EverydayMinimalSection({ products, storefront }: { products: Product[]; storefront: StorefrontSettings }) {
+  const productCardContent = storefront.productCard || defaultProductCardContent;
+  const minimalProducts = products.filter((product) => product.everydayMinimal).slice(0, 4);
+
+  if (minimalProducts.length === 0) return null;
+
+  return (
+    <section className="py-20 md:py-28 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-end justify-between mb-14 gap-8">
+          <div className="flex-1">
+            <p className="text-[10px] tracking-[0.5em] uppercase text-slate-500 mb-4 font-medium">Daily Elegance</p>
+            <h2 className="font-serif text-5xl md:text-6xl text-slate-900">Everyday Minimal</h2>
+            <p className="text-slate-600 mt-4 max-w-md">Modern minimal designs that complement any occasion from casual to professional.</p>
+          </div>
+          <Link href="/collections/everyday-luxe" className="hidden md:flex items-center gap-2 text-sm tracking-widest uppercase text-slate-900 hover:text-slate-600 transition-colors font-medium whitespace-nowrap">
+            View All <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {minimalProducts.map((product) => <ProductCard key={product.id} product={product} content={productCardContent} />)}
         </div>
       </div>
     </section>
@@ -601,6 +700,9 @@ export default function HomePageClient({ products, collections, storefront }: Ho
       <HeroSection storefront={storefront} />
       <CollectionsSection collections={collections} />
       <BestsellersSection products={products} storefront={storefront} />
+      <BridalLuxeSection products={products} storefront={storefront} />
+      <HeritageSection products={products} storefront={storefront} />
+      <EverydayMinimalSection products={products} storefront={storefront} />
       <EditorialSection />
       <NewArrivalsSection products={products} storefront={storefront} />
       <TrustSection storefront={storefront} />

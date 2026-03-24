@@ -84,6 +84,13 @@ export interface DbOrder {
   updatedAt: string;
 }
 
+export interface DbCarouselBanner {
+  id: string;
+  image: string;
+  headline: string;
+  subtitle: string;
+}
+
 export interface DbStorefrontHero {
   badge: string;
   title: string;
@@ -103,6 +110,11 @@ export interface DbStorefrontHero {
     title: string;
     href: string;
   };
+}
+
+export interface DbStorefrontCarousel {
+  id: string;
+  banners: DbCarouselBanner[];
 }
 
 export interface DbStorefrontTrustSignal {
@@ -133,6 +145,7 @@ export interface DbStorefrontSettings {
     };
   };
   hero: DbStorefrontHero;
+  carousel: DbStorefrontCarousel;
   luxurySignals: string[];
   trustSection: {
     badge: string;
@@ -191,6 +204,36 @@ const ADMIN_LOGIN_EMAIL = (process.env.ADMIN_LOGIN_EMAIL || 'admin@gijayi.com').
 const ADMIN_LOGIN_PASSWORD = process.env.ADMIN_LOGIN_PASSWORD || 'Admin@123';
 const ADMIN_NAME = 'Platform Admin';
 
+export const DEFAULT_STOREFRONT_CAROUSEL: DbStorefrontCarousel = {
+  id: 'carousel-config',
+  banners: [
+    {
+      id: 'banner-1',
+      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=90',
+      headline: 'Handcrafted Bridal Luxury',
+      subtitle: 'Statement jewelry designed for grand wedding celebrations.',
+    },
+    {
+      id: 'banner-2',
+      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=90',
+      headline: 'Timeless Kundan & Polki',
+      subtitle: 'Classic Indian artistry with modern, wearable elegance.',
+    },
+    {
+      id: 'banner-3',
+      image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1400&q=90',
+      headline: 'Made in India Craftsmanship',
+      subtitle: 'Every detail is handcrafted with premium materials.',
+    },
+    {
+      id: 'banner-4',
+      image: 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=1400&q=90',
+      headline: 'Affordable Designer Jewelry',
+      subtitle: 'Luxury-inspired looks at fair prices.',
+    },
+  ],
+};
+
 export const DEFAULT_STOREFRONT_SETTINGS: DbStorefrontSettings = {
   id: 'storefront-config',
   navigation: {
@@ -206,6 +249,7 @@ export const DEFAULT_STOREFRONT_SETTINGS: DbStorefrontSettings = {
       label: 'Fresh Arrival',
     },
   },
+  carousel: cloneState(DEFAULT_STOREFRONT_CAROUSEL),
   hero: {
     badge: 'Handcrafted Indian Jewellery',
     title: 'Handcrafted Bridal & Statement Jewelry',
@@ -378,6 +422,13 @@ function normalizeStorefrontSettings(value: Partial<DbStorefrontSettings> | unde
           ? value.testimonialsSection.testimonials
           : DEFAULT_STOREFRONT_SETTINGS.testimonialsSection.testimonials,
     },
+    carousel: {
+      id: value?.carousel?.id || DEFAULT_STOREFRONT_SETTINGS.carousel?.id || 'carousel-config',
+      banners:
+        value?.carousel?.banners && value.carousel.banners.length
+          ? value.carousel.banners
+          : DEFAULT_STOREFRONT_SETTINGS.carousel?.banners || [],
+    },
     luxurySignals:
       value?.luxurySignals && value.luxurySignals.length
         ? value.luxurySignals
@@ -481,7 +532,16 @@ async function ensureDatabase(): Promise<void> {
   }
 
   if (storefrontCount === 0) {
-    await storefrontCollection.insertOne(DEFAULT_STOREFRONT_SETTINGS);
+    const defaultSettings = cloneState(DEFAULT_STOREFRONT_SETTINGS);
+    await storefrontCollection.insertOne(defaultSettings);
+  } else {
+    const existing = await storefrontCollection.findOne({ id: 'storefront-config' });
+    if (existing && !existing.carousel) {
+      await storefrontCollection.updateOne(
+        { id: 'storefront-config' },
+        { $set: { carousel: cloneState(DEFAULT_STOREFRONT_CAROUSEL) } },
+      );
+    }
   }
 }
 

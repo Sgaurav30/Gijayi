@@ -68,6 +68,10 @@ export async function PUT(request: NextRequest, context: Context) {
         isNew: body.isNew !== undefined ? Boolean(body.isNew) : current.isNew,
         isBestseller: body.isBestseller !== undefined ? Boolean(body.isBestseller) : current.isBestseller,
         stock: body.stock !== undefined ? Number(body.stock) : current.stock,
+        mostWanted: body.mostWanted !== undefined ? Boolean(body.mostWanted) : current.mostWanted,
+        bridalLuxe: body.bridalLuxe !== undefined ? Boolean(body.bridalLuxe) : current.bridalLuxe,
+        heritage: body.heritage !== undefined ? Boolean(body.heritage) : current.heritage,
+        everydayMinimal: body.everydayMinimal !== undefined ? Boolean(body.everydayMinimal) : current.everydayMinimal,
       };
     });
 
