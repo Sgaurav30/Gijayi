@@ -34,12 +34,12 @@ export default function ContactPage() {
               <div className="border border-[#efe6d7] bg-white p-5">
                 <Mail size={18} className="text-[#b8963e] mb-3" />
                 <p className="text-xs tracking-[0.3em] uppercase text-gray-500 mb-2">Email</p>
-                <a href="mailto:hello@gijayi.com" className="font-medium hover:text-[#b8963e]">hello@gijayi.com</a>
+                <a href="mailto:gijaayi@gmail.com" className="font-medium hover:text-[#b8963e]">gijaayi@gmail.com</a>
               </div>
               <div className="border border-[#efe6d7] bg-white p-5">
                 <Phone size={18} className="text-[#b8963e] mb-3" />
                 <p className="text-xs tracking-[0.3em] uppercase text-gray-500 mb-2">Phone</p>
-                <a href="tel:+911234567890" className="font-medium hover:text-[#b8963e]">+91 12345 67890</a>
+                <a href="tel:+917310580050" className="font-medium hover:text-[#b8963e]">+91 731 058 0050</a>
               </div>
               <div className="border border-[#efe6d7] bg-white p-5">
                 <MapPin size={18} className="text-[#b8963e] mb-3" />

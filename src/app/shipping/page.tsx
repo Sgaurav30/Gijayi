@@ -48,7 +48,7 @@ export default function ShippingPage() {
       <section className="mt-10 border border-[#efe6d7] p-6 md:p-8">
         <h2 className="font-serif text-3xl mb-4">Need an exchange or return?</h2>
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
-          Email hello@gijayi.com with your order number, reason for return, and unboxing photos if applicable. Our team will confirm eligibility and next steps.
+          Email gijaayi@gmail.com with your order number, reason for return, and unboxing photos if applicable. Our team will confirm eligibility and next steps.
         </p>
         <Link href="/contact" className="inline-flex items-center text-xs tracking-widest uppercase text-[#b8963e] hover:text-[#1a1a1a]">
           Start a return request
